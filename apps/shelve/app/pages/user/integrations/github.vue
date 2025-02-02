@@ -12,27 +12,29 @@ const { data: apps, status, refresh } = await useFetch('/api/github/apps', {
   method: 'GET'
 })
 
-const appUrl = window.location.origin
+const { githubAppSlug } = useRuntimeConfig().public
+function installGitHubApp() {
+  useCookie('login_redirect').value = '/api/github/apps/complete'
+  const popup = window.open(
+    `https://github.com/apps/${githubAppSlug}/installations/new`,
+    '_blank',
+    'width=500,height=500'
+  )
 
-const manifest = {
-  name: getRandomGithubAppName(),
-  url: appUrl,
-  hook_attributes: {
-    url: `${appUrl}/api/githook`
-  },
-  redirect_url: `${appUrl}/callback/github`,
-  callback_urls: [`${appUrl}/callback/github`],
-  setup_url: `${ appUrl }/user/integrations/github`,
-  description: 'Shelve GitHub App',
-  public: false,
-  default_permissions: {
-    issues: 'write',
-    pull_requests: 'write',
-    administration: 'write',
-    contents: 'write',
-    metadata: 'read',
-    secrets: 'write',
-  }
+  const checkClosed = setInterval(() => {
+    if (popup?.closed) {
+      clearInterval(checkClosed)
+    }
+  }, 500)
+
+  window.addEventListener('message', async (event) => {
+    console.log(event)
+    if (event.origin !== window.location.origin) return
+    if (event.data?.installationId) {
+      popup?.close()
+      await refresh()
+    }
+  })
 }
 
 const modal = useModal()
@@ -61,10 +63,7 @@ function openDeleteModal(slug: string) {
 <template>
   <div class="flex flex-col gap-4 pb-4">
     <Teleport defer to="#action-items">
-      <form action="https://github.com/settings/apps/new" method="post">
-        <input id="manifest" type="text" name="manifest" class="hidden" :value="JSON.stringify(manifest)">
-        <UButton icon="simple-icons:github" label="Create GitHub App" size="xs" type="submit" />
-      </form>
+      <UButton icon="simple-icons:github" label="Create GitHub App" size="xs" @click="installGitHubApp" />
     </Teleport>
     <div style="--stagger: 1" data-animate class="flex flex-col gap-3">
       <div class="flex flex-col gap-1">
@@ -160,25 +159,22 @@ function openDeleteModal(slug: string) {
             Create a GitHub App to start managing your repositories and synchronizing secrets across your environments.
           </p>
 
-          <form action="https://github.com/settings/apps/new" method="post" class="inline-block">
-            <input id="manifest-empty" type="text" name="manifest" class="hidden" :value="JSON.stringify(manifest)">
-            <UButton
-              type="submit"
-              size="sm"
-              class="group"
-            >
-              <template #leading>
-                <UIcon name="simple-icons:github" class="size-4" />
-              </template>
-              Create Your First GitHub App
-              <template #trailing>
-                <UIcon
-                  name="lucide:arrow-right"
-                  class="size-4 transition-transform group-hover:translate-x-1"
-                />
-              </template>
-            </UButton>
-          </form>
+          <UButton
+            size="sm"
+            class="group"
+            @click="installGitHubApp"
+          >
+            <template #leading>
+              <UIcon name="simple-icons:github" class="size-4" />
+            </template>
+            Create Your First GitHub App
+            <template #trailing>
+              <UIcon
+                name="lucide:arrow-right"
+                class="size-4 transition-transform group-hover:translate-x-1"
+              />
+            </template>
+          </UButton>
         </div>
 
         <div class="mt-4 grid grid-cols-2 gap-4 w-full max-w-md">

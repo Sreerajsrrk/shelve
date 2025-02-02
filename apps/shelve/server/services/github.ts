@@ -1,6 +1,10 @@
 import jwt from 'jsonwebtoken'
 import type { H3Event } from 'h3'
 import type { GithubApp, GitHubAppResponse, GitHubRepo } from '@types'
+import { Octokit } from '@octokit/core'
+import { restEndpointMethods } from '@octokit/plugin-rest-endpoint-methods'
+import { paginateRest } from '@octokit/plugin-paginate-rest'
+import { createAppAuth, createOAuthUserAuth } from '@octokit/auth-app'
 
 import nacl from 'tweetnacl'
 import { blake2b } from 'blakejs'
@@ -37,18 +41,35 @@ function cryptoBoxSeal(
   return sealedBox
 }
 
+export async function useOctokitUser(accessToken: string) {
+  const restOctokit = Octokit.plugin(restEndpointMethods, paginateRest)
+  return new restOctokit({
+    authStrategy: createOAuthUserAuth,
+    auth: {
+      clientId: process.env.NUXT_OAUTH_GITHUB_CLIENT_ID,
+      clientSecret: process.env.NUXT_OAUTH_GITHUB_CLIENT_SECRET,
+      type: 'oauth-app', // https://github.com/octokit/auth-oauth-user.js/#when-passing-an-existing-authentication-object
+      token: accessToken
+    }
+  })
+}
+
 export class GithubService {
 
   private readonly GITHUB_API = 'https://api.github.com'
   private readonly tokenCache = new Map<string, { token: string; expiresAt: Date }>()
   private readonly encryptionKey: string
+  private readonly webhookSecret: string
+  private readonly appPrivateKey: string
 
   constructor(event: H3Event) {
-    this.encryptionKey = useRuntimeConfig(event).private.encryptionKey
+    const runtimeConfig = useRuntimeConfig(event)
+    const { webhookSecret, appPrivateKey } = runtimeConfig.github
+    this.encryptionKey = runtimeConfig.private.encryptionKey
+    this.webhookSecret = webhookSecret
+    this.appPrivateKey = appPrivateKey
     if (!this.encryptionKey) {
       console.error('Encryption key is not defined in runtime config!')
-    } else {
-      console.log('Encryption key loaded successfully.')
     }
   }
 
@@ -60,36 +81,15 @@ export class GithubService {
     return (await unseal(value, this.encryptionKey)) as string
   }
 
-  async handleAppCallback(userId: number, code: string) {
-    const appConfig = await $fetch<GitHubAppResponse>(
-      `${this.GITHUB_API}/app-manifests/${code}/conversions`,
-      {
-        method: 'POST',
-        headers: {
-          Accept: 'application/vnd.github.v3+json'
-        }
-      }
-    )
-
+  async handleAppCallback(userId: number, installationId: string) {
     await useDrizzle().insert(tables.githubApp).values({
-      slug: appConfig.slug,
-      appId: appConfig.id,
-      privateKey: await this.encryptValue(appConfig.pem),
-      webhookSecret: await this.encryptValue(appConfig.webhook_secret),
-      clientId: appConfig.client_id,
-      clientSecret: await this.encryptValue(appConfig.client_secret),
+      appId: -1,
+      installationId,
       userId: userId
     })
-
-    return `https://github.com/apps/${appConfig.slug}/installations/new`
   }
 
-  private async getAuthToken(userId: number): Promise<string> {
-    const cached = this.tokenCache.get(String(userId))
-    if (cached?.expiresAt && cached.expiresAt > new Date()) {
-      return cached.token
-    }
-
+  private async getAuthToken(userId: number) {
     const app = await useDrizzle().query.githubApp.findFirst({
       where: eq(tables.githubApp.userId, userId)
     })
@@ -98,70 +98,34 @@ export class GithubService {
         statusCode: 404,
         statusMessage: 'GitHub App not found'
       })
-    const privateKey = await this.decryptValue(app.privateKey)
 
-    const now = Math.floor(Date.now() / 1000)
-    const appJWT = jwt.sign(
-      {
-        iat: now - 60,
-        exp: now + 10 * 60,
-        iss: app.appId
-      },
-      privateKey,
-      { algorithm: 'RS256' }
-    )
+    return await this.useOctokitInstallation(+app.installationId)
+  }
 
-    const installations = await $fetch<{ id: number }[]>(
-      `${this.GITHUB_API}/app/installations`,
-      {
-        headers: {
-          Authorization: `Bearer ${appJWT}`,
-          Accept: 'application/vnd.github.v3+json'
-        }
-      }
-    )
-    if (!installations.length)
-      throw createError({
-        statusCode: 404,
-        statusMessage:
-          'GitHub App not installed in any repositories'
-      })
-
-    const { token } = await $fetch<{
-      token: string
-      expires_at: string
-    }>(`${this.GITHUB_API}/app/installations/${installations[0].id}/access_tokens`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${appJWT}`,
-        Accept: 'application/vnd.github.v3+json'
+  async useOctokitInstallation(installationId: number) {
+    const base64DecodedPrivateKey = Buffer.from(this.appPrivateKey, 'base64').toString('utf-8')
+    const restOctokit = Octokit.plugin(restEndpointMethods, paginateRest)
+    return new restOctokit({
+      authStrategy: createAppAuth,
+      auth: {
+        appId: process.env.NUXT_OAUTH_GITHUB_CLIENT_ID,
+        clientSecret: process.env.NUXT_OAUTH_GITHUB_CLIENT_SECRET,
+        privateKey: base64DecodedPrivateKey,
+        installationId
       }
     })
-
-    this.tokenCache.set(String(userId), {
-      token,
-      expiresAt: new Date(Date.now() + 55 * 60 * 1000)
-    })
-
-    return token
   }
 
   async getUserRepos(
     userId: number,
     query?: string
   ): Promise<GitHubRepo[]> {
-    const token = await this.getAuthToken(userId)
+    const octokit = await this.getAuthToken(userId)
 
     try {
-      const response = await $fetch<{
-        repositories: GitHubRepo[]
-      }>(`${this.GITHUB_API}/installation/repositories?per_page=100`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/vnd.github.v3+json'
-        }
-      })
-      const repos = response.repositories
+      const response = await octokit.rest.repos.get()
+      console.log(response)
+      const repos = response
 
       if (!query) return repos
 
@@ -169,6 +133,7 @@ export class GithubService {
         repo.name.toLowerCase().includes(query.toLowerCase())
       )
     } catch (error: any) {
+      console.log(error)
       throw createError({
         statusCode: error.status || 500,
         statusMessage: `Failed to fetch repositories: ${error.message}`

@@ -18,12 +18,16 @@ export default defineNuxtConfig({
     rollupConfig: {
       // @ts-expect-error - this is not typed
       plugins: [vue()]
+    },
+    imports: {
+      dirs: ['./server/services']
     }
   },
 
   hub: {
     database: true,
-    cache: true
+    cache: true,
+    blob: true
   },
 
   /*$development: {
@@ -37,20 +41,18 @@ export default defineNuxtConfig({
       name: 'shelve_session',
       maxAge: 60 * 60 * 24 * 30, // 30 days
     },
+    github: {
+      appPrivateKey: process.env.NUXT_GITHUB_APP_PRIVATE_KEY,
+      webhookSecret: process.env.NUXT_GITHUB_WEBHOOK_SECRET,
+      appId: process.env.NUXT_GITHUB_APP_ID,
+    },
     private: {
       resendApiKey: '',
-      encryptionKey: '',
-      adminEmails: '',
+      encryptionKey: process.env.NUXT_PRIVATE_ENCRYPTION_KEY,
+      adminEmails: process.env.NUXT_PRIVATE_ADMIN_EMAILS
     },
-    oauth: {
-      google: {
-        clientId: '',
-        clientSecret: '',
-      },
-      github: {
-        clientId: '',
-        clientSecret: '',
-      },
+    public: {
+      githubAppSlug: process.env.NUXT_GITHUB_APP_SLUG,
     }
   },
 
