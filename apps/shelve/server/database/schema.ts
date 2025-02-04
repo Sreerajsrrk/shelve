@@ -23,7 +23,6 @@ export const users = sqliteTable('users', {
 
 export const githubApp = sqliteTable('github_app', {
   id: integer().primaryKey({ autoIncrement: true }),
-  appId: integer().unique().notNull(),
   installationId: text().unique().notNull(),
   userId: integer().notNull().references(() => users.id, { onDelete: 'cascade' }),
   ...timestamps,
