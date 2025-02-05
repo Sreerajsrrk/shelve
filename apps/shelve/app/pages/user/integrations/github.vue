@@ -41,10 +41,10 @@ const modal = useModal()
 function openDeleteModal(slug: string) {
   modal.open(ConfirmModal, {
     title: 'Delete Github App',
-    description: `You are about to delete ${slug}. This action cannot be undone.`,
+    description: `You are about to delete ${githubAppSlug}. This action cannot be undone.`,
     danger: true,
     async onSuccess() {
-      const response = await $fetch(`/api/github/apps/${slug}`, {
+      const response = await $fetch(`/api/github/apps`, {
         method: 'DELETE'
       })
       toast.success(response.message, {
@@ -106,7 +106,7 @@ function openDeleteModal(slug: string) {
             </div>
             <div class="flex flex-col gap-2">
               <NuxtLink
-                :to="`https://github.com/apps/${app.slug}/installations/new`"
+                :to="`https://github.com/apps/${githubAppSlug}/installations/new`"
                 target="_blank"
                 class="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
               >
@@ -116,7 +116,7 @@ function openDeleteModal(slug: string) {
               </NuxtLink>
 
               <NuxtLink
-                :to="`https://github.com/settings/apps/${app.slug}/permissions`"
+                :to="`https://github.com/settings/apps/${githubAppSlug}/permissions`"
                 target="_blank"
                 class="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
               >

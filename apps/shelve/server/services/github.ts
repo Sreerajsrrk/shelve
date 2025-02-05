@@ -83,7 +83,6 @@ export class GithubService {
 
   async handleAppCallback(userId: number, installationId: string) {
     await useDrizzle().insert(tables.githubApp).values({
-      appId: -1,
       installationId,
       userId: userId
     })
@@ -99,10 +98,10 @@ export class GithubService {
         statusMessage: 'GitHub App not found'
       })
 
-    return await this.useOctokitInstallation(+app.installationId)
+    return this.useOctokitInstallation(+app.installationId)
   }
 
-  async useOctokitInstallation(installationId: number) {
+  useOctokitInstallation(installationId: number) {
     const base64DecodedPrivateKey = Buffer.from(this.appPrivateKey, 'base64').toString('utf-8')
     const restOctokit = Octokit.plugin(restEndpointMethods, paginateRest)
     return new restOctokit({
@@ -228,20 +227,14 @@ export class GithubService {
     })
   }
 
-  async deleteApp(userId: number, slug: string) {
+  async deleteApp(userId: number) {
     await useDrizzle()
       .delete(tables.githubApp)
-      .where(
-        and(
-          eq(tables.githubApp.userId, userId),
-          eq(tables.githubApp.slug, slug)
-        )
-      )
+      .where(eq(tables.githubApp.userId, userId))
 
     return {
       statusCode: 200,
       message: 'App removed from Shelve. Dont forget to delete it from GitHub',
-      link: `https://github.com/settings/apps/${slug}/advanced`
     }
   }
 
