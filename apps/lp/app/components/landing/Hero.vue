@@ -1,4 +1,10 @@
 <script setup lang="ts">
+defineProps<{
+  title: string
+  description: string
+  cta: string
+}>()
+
 defineShortcuts({
   s: {
     usingInput: true,
@@ -15,18 +21,20 @@ defineShortcuts({
       <div class="flex items-center justify-center">
         <Logo :text="false" lp size="size-10" />
       </div>
-      <div class="mx-auto max-w-md text-pretty text-center text-3xl sm:text-4xl">
-        The all-in-one developer <span class="font-newsreader font-light italic">workspace</span>
-      </div>
+      <MDC
+        :value="title"
+        class="mx-auto max-w-md text-pretty text-center text-3xl sm:text-4xl"
+        tag="div"
+      />
       <p class="mx-auto mt-2 max-w-lg text-center text-neutral-400 sm:block">
-        Automate your workflow, manage your projects, and work faster with your team.
+        {{ description }}
       </p>
-      <p class="mt-4 hidden text-center text-neutral-400 sm:block">
-        Press <UKbd>S</UKbd> to start your journey
-      </p>
-      <div class="mt-4 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-4">
+      <MDC
+        class="mt-4 hidden text-center text-neutral-400 sm:block"
+        :value="cta"
+      />
+      <div class="mt-4 sm:hidden flex-col items-center justify-center gap-2 flex sm:gap-4">
         <UButton
-          class="sm:hidden"
           :to="`https://app.shelve.cloud/login`"
           label="Start your journey"
           icon="lucide:arrow-right"

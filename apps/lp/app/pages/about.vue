@@ -3,7 +3,9 @@ definePageMeta({
   colorMode: 'dark',
 })
 
-const data = await queryCollection('about').first()
+const { data } = await useAsyncData('about', () => {
+  return queryCollection('about').first()
+})
 </script>
 
 <template>
@@ -28,14 +30,14 @@ const data = await queryCollection('about').first()
       <div class="h-screen pointer-events-none" />
 
       <USeparator />
-      <div class="relative w-full pt-10 sm:pt-20 bg-neutral-950 z-10">
+      <div v-if="data" class="relative w-full pt-10 sm:pt-20 bg-neutral-950 z-10">
         <div v-for="(section, index) in data.about" :key="index" class="group max-w-5xl mx-auto px-4 pointer-events-auto">
           <div class="flex flex-col sm:grid sm:grid-cols-12 gap-16 py-16 group-last:pb-0">
             <div class="col-span-5 relative">
               <ProseImg
                 :src="section.image"
                 :alt="section.title"
-                class="grayscale col-span-12 w-full"
+                class="grayscale col-span-12 w-full mix-blend-lighten"
               />
             </div>
             <div class="col-span-7">
@@ -49,13 +51,13 @@ const data = await queryCollection('about').first()
                 <MDC class="text-sm leading-relaxed text-neutral-400" :value="section.content" unwrap="p" />
               </div>
             </div>
+            <div class="hidden group-last:flex col-span-12 justify-end bg-neutral-950 mb-16">
+              <Signature />
+            </div>
           </div>
           <USeparator class="group-last:hidden" />
         </div>
       </div>
-      <UContainer class="flex items-center justify-center sm:justify-end py-16 bg-neutral-950">
-        <Signature />
-      </UContainer>
     </div>
   </div>
 </template>

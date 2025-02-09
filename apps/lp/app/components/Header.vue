@@ -6,7 +6,7 @@ defineProps<{
   links: NavigationMenuItem[]
 }>()
 
-const navigation = inject<Ref<ContentNavigationItem[]>>('navigation')
+const navigation = inject<Ref<ContentNavigationItem[]>>('docs-navigation')
 
 const { version } = useRuntimeConfig().public
 
@@ -59,8 +59,3 @@ defineShortcuts({
     </template>
   </UHeader>
 </template>
-
-<style>
-:root {
-}
-</style>

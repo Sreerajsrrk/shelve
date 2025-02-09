@@ -2,10 +2,13 @@ import { defineCollection, z } from '@nuxt/content'
 import { asSeoCollection } from '@nuxtjs/seo/content'
 
 export const collections = {
-  content: defineCollection(
+  docs: defineCollection(
     asSeoCollection({
       type: 'page',
-      source: '**/*',
+      source: {
+        include: 'docs/**/*',
+        prefix: ''
+      },
       schema: z.object({
         navigation: z.object({
           title: z.string().optional(),
@@ -23,6 +26,37 @@ export const collections = {
       })
     })
   ),
+  blog: defineCollection(
+    asSeoCollection({
+      type: 'page',
+      source: 'blog/**/*.md',
+      schema: z.object({
+        title: z.string().nonempty(),
+        description: z.string().nonempty(),
+        date: z.string(),
+        image: z.string(),
+        tags: z.array(z.string()),
+        authors: z.array(z.object({
+          name: z.string(),
+          description: z.string(),
+          to: z.string(),
+          target: z.string(),
+          avatar: z.object({
+            src: z.string(),
+            alt: z.string()
+          }).optional()
+        })),
+      })
+    })
+  ),
+  blogPage: defineCollection({
+    type: 'data',
+    source: 'blog.yml',
+    schema: z.object({
+      title: z.string().nonempty(),
+      description: z.string().nonempty()
+    })
+  }),
   about: defineCollection({
     type: 'data',
     source: 'about.yml',
@@ -33,5 +67,37 @@ export const collections = {
         content: z.string()
       }))
     })
-  })
+  }),
+  index: defineCollection({
+    type: 'data',
+    source: 'index.yml',
+    schema: z.object({
+      title: z.string().nonempty(),
+      description: z.string().nonempty(),
+      cta: z.string().nonempty(),
+      features: z.object({
+        title: z.string(),
+        description: z.string(),
+        features: z.array(z.object({
+          title: z.string().nonempty(),
+          description: z.string().nonempty(),
+          icon: z.string().nonempty(),
+          soon: z.boolean().optional()
+        }))
+      }),
+      faq: z.object({
+        title: z.string().nonempty(),
+        description: z.string().nonempty(),
+        cta: z.object({
+          label: z.string().nonempty(),
+          to: z.string().nonempty()
+        }),
+        items: z.array(z.object({
+          label: z.string().nonempty(),
+          defaultOpen: z.boolean().optional(),
+          content: z.string().nonempty()
+        }))
+      })
+    })
+  }),
 }
