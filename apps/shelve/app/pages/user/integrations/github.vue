@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { getRandomGithubAppName } from '~~/server/utils/random'
 import { ConfirmModal } from '#components'
 
 definePageMeta({
@@ -28,7 +27,6 @@ function installGitHubApp() {
   }, 500)
 
   window.addEventListener('message', async (event) => {
-    console.log(event)
     if (event.origin !== window.location.origin) return
     if (event.data?.installationId) {
       popup?.close()
@@ -99,7 +97,7 @@ function openDeleteModal(slug: string) {
               </div>
               <div class="flex flex-col">
                 <h3 class="font-semibold">
-                  {{ app.slug }}
+                  {{ githubAppSlug }}
                 </h3>
                 <span class="text-xs text-neutral-500">GitHub App</span>
               </div>

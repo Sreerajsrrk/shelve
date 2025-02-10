@@ -41,14 +41,14 @@ function cryptoBoxSeal(
   return sealedBox
 }
 
-export async function useOctokitUser(accessToken: string) {
+export function useOctokitUser(accessToken: string) {
   const restOctokit = Octokit.plugin(restEndpointMethods, paginateRest)
   return new restOctokit({
     authStrategy: createOAuthUserAuth,
     auth: {
       clientId: process.env.NUXT_OAUTH_GITHUB_CLIENT_ID,
       clientSecret: process.env.NUXT_OAUTH_GITHUB_CLIENT_SECRET,
-      type: 'oauth-app', // https://github.com/octokit/auth-oauth-user.js/#when-passing-an-existing-authentication-object
+      type: 'oauth-app',
       token: accessToken
     }
   })
@@ -117,20 +117,25 @@ export class GithubService {
 
   async getUserRepos(
     userId: number,
+    accessToken: string,
     query?: string
   ): Promise<GitHubRepo[]> {
-    const octokit = await this.getAuthToken(userId)
+    const octokit = useOctokitUser(accessToken)
+
+    const installationId = await this.getUserApps(userId).then(apps => apps[0].installationId)
+
+    const repositories = await octokit.paginate(
+      octokit.rest.apps.listInstallationReposForAuthenticatedUser,
+      {
+        installation_id: Number.parseInt(installationId),
+        per_page: 100
+      }
+    )
 
     try {
-      const response = await octokit.rest.repos.get()
-      console.log(response)
-      const repos = response
+      if (!query) return repositories
 
-      if (!query) return repos
-
-      return repos.filter((repo: GitHubRepo) =>
-        repo.name.toLowerCase().includes(query.toLowerCase())
-      )
+      return repositories.filter((repo) => repo.name.toLowerCase().includes(query.toLowerCase()))
     } catch (error: any) {
       console.log(error)
       throw createError({
@@ -203,26 +208,8 @@ export class GithubService {
     }
   }
 
-  async getSecrets(userId: number, repository: string) {
-    const token = await this.getAuthToken(userId)
-
-    try {
-      return await $fetch(`${this.GITHUB_API}/repos/${repository}/actions/secrets`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: 'application/vnd.github.v3+json'
-        }
-      })
-    } catch (error: any) {
-      throw createError({
-        statusCode: error.status || 500,
-        statusMessage: `Failed to fetch secrets: ${error.message}`
-      })
-    }
-  }
-
-  async getUserApps(userId: number): Promise<GithubApp[]> {
-    return await useDrizzle().query.githubApp.findMany({
+  getUserApps(userId: number) {
+    return useDrizzle().query.githubApp.findMany({
       where: eq(tables.githubApp.userId, userId)
     })
   }
