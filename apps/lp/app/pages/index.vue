@@ -37,15 +37,14 @@ function useClipboard(text: string) {
     <UPageSection orientation="horizontal" :ui="{ container: 'sm:pb-0 lg:pb-8' }">
       <template #leading>
         <div class="text-left">
-          <NuxtLink href="https://www.uneed.best/tool/shelve">
+          <!-- <NuxtLink href="https://www.uneed.best/tool/shelve">
             <img src="https://www.uneed.best/EMBED3B.png" alt="Uneed Embed Badge" width="150">
-          </NuxtLink>
+          </NuxtLink> -->
           <h3 class="main-gradient italic text-2xl mb-2 mt-4">
-            <ScrambleText label="> Welcome to Shelve" />
+            <ScrambleText label="> Welcome to RashiRhythm" />
           </h3>
           <p class="text-(--ui-text-muted)">
-            Shelve is the best place to manage your projects, alone or with your team. Store your project secrets, data, files and more in one place.
-            Use our CLI to manage your projects without leaving your terminal.
+            RashiRhythm is the ultimate tool for astrology enthusiasts. It helps you analyze planetary positions, generate accurate predictions, and streamline your consultations with powerful insights.
           </p>
         </div>
       </template>

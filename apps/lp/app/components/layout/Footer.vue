@@ -124,9 +124,6 @@ const columns = ref([
           aria-label="GitHub"
         />
         <UColorModeButton />
-        <div style="color-scheme: none;">
-          <iframe src="https://status.shelve.cloud/badge?theme=dark" height="30" width="200" />
-        </div>
       </div>
     </template>
   </UFooter>

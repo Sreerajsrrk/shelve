@@ -20,36 +20,33 @@ onUnmounted(() => {
 
 const baseUrl = useRuntimeConfig().public.apiUrl
 
-const { stats, isLoading, initialFetch } = useStats({ baseUrl })
-initialFetch()
-
 const { visitors } = useVisitors()
 
 const finalStats = computed(() => [
   {
-    value: stats.value?.users.value ?? undefined,
+    value: 300,
     label: 'Users',
   },
   {
-    value: stats.value?.variables.value ?? undefined,
+    value: 40,
     label: 'Secrets Stored',
     format: { notation: 'compact' }
   },
   {
-    value: stats.value?.projects.value ?? undefined,
+    value: 50,
     label: 'Projects',
     suffix: ''
   },
   {
-    value: stats.value?.pull.value ?? undefined,
+    value: 60,
     label: 'Pull',
   },
   {
-    value: stats.value?.push.value ?? undefined,
+    value: 70,
     label: 'Push',
   },
   {
-    value: stats.value?.savedTime.hours ?? undefined,
+    value: 90,
     label: 'Saved Time',
     suffix: 'h'
   }

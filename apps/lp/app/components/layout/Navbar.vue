@@ -32,12 +32,12 @@ const items = [
         icon: 'simple-icons:github',
         to: '/docs/integrations/github'
       },
-      {
-        label: 'Roadmap',
-        icon: 'heroicons:map-solid',
-        description: 'See what\'s coming next',
-        to: '/roadmap',
-      }
+      // {
+      //   label: 'Roadmap',
+      //   icon: 'heroicons:map-solid',
+      //   description: 'See what\'s coming next',
+      //   to: '/roadmap',
+      // }
     ]
   },
   {
@@ -154,17 +154,6 @@ const navigationUi = computed(() => ({
           </div>
         </template>
       </UNavigationMenu>
-
-      <template #right>
-        <div class="flex items-center gap-2">
-          <div>
-            <CustomButton to="https://app.shelve.cloud/login">
-              Open App
-              <UKbd value="S" />
-            </CustomButton>
-          </div>
-        </div>
-      </template>
 
       <template #body>
         <UNavigationMenu :items orientation="vertical" class="-mx-2.5" />

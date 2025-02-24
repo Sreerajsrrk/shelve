@@ -1,54 +1,71 @@
-title: The all-in-one developer [workspace]{ .font-serif .font-light .italic }
-description: Automate your workflow, manage your projects, and work faster with your team.
-cta: Press :kbd{value="S"} to start your journey
+title: The all-in-one astrology [consultation]{ .font-serif .font-light .italic }
+description: Explore your cosmic blueprint, gain clarity, and align with life's natural rhythms.
+cta: Press :kbd{value="S"} to begin your journey
+
+hero:
+  title: Welcome to RashiRhythm
+  description: RashiRhythm is the ultimate tool for astrology enthusiasts. It helps you analyze planetary positions, generate accurate predictions, and streamline your consultations with powerful insights.
+  cta: Get Started
+
 features:
   title: Features
-  description: Shelve is packed with features that make managing your environment variables a breeze. Here are some of the highlights.
+  description: RashiRhythm offers personalized astrological insights to help you navigate life with awareness. Here are some of the key offerings.
   items:
-    - title: Secrets Injection
-      description: Say goodbye to .env files and start your application without .env with runtime secrets injection. No more env files, more security.
-      icon: lucide:cpu
-    - title: Seamless Environment Management
-      description: One login, all projects. Push and pull environment variables instantly across your entire team without the hassle.
-      icon: lucide:lock
-    - title: Powerful CLI Experience
-      description: A CLI-first approach that makes managing env variables feel natural. Simple commands, powerful results.
-      icon: lucide:terminal
-    - title: Built for Teams
-      description: Manage multiple teams, control access levels, and collaborate effortlessly. Perfect for organizations with multiple projects.
-      icon: lucide:users
-    - title: Native Monorepo Support
-      description: Working with monorepos? Shelve automatically detects and manages configurations across all your projects.
-      icon: lucide:git-fork
-    - title: GitHub Integration
-      description: Sync your environment variables directly with GitHub Secrets. One click to secure your GitHub Actions workflows.
-      icon: simple-icons:github
-    - title: Self-Hosting Ready
-      description: Deploy Shelve on your own infrastructure with Docker. Keep full control of your data.
-      icon: lucide:cloud
-    - title: Advanced Integrations
-      description: 'More integrations coming soon: Vercel, Coolify, and more.'
-      icon: lucide:puzzle
+    - title: Birth Chart Analysis
+      description: Understand the placements of planets at your birth and their influence on your life journey.
+      icon: lucide:star
+    - title: Rashi & Nakshatra Insights
+      description: Explore your zodiac sign and lunar constellation to gain deeper self-awareness.
+      icon: lucide:moon
+    - title: Life Path Guidance
+      description: Get clarity on career, relationships, and key life decisions based on astrological principles.
+      icon: lucide:compass
+    - title: Personalized Consultations
+      description: One-on-one sessions tailored to your specific questions and concerns.
+      icon: lucide:user
+    - title: Muhurta Selection
+      description: Find auspicious timings for important events like weddings, business launches, and travel.
+      icon: lucide:calendar
+    - title: Planetary Transits & Remedies
+      description: Understand how current planetary movements affect you and explore simple remedies.
+      icon: lucide:sun
+    - title: Compatibility Analysis
+      description: Discover relationship compatibility based on astrological alignments.
+      icon: lucide:heart
+    - title: Continuous Learning
+      description: 'Stay informed with articles, updates, and evolving astrological perspectives.'
+      icon: lucide:book
       soon: true
+
+stats:
+  title: Platform Insights
+  description: Explore key statistics about our astrology services and user engagement.
+
 faq:
   title: Frequently Asked Questions
-  description: Frequently asked questions about Shelve. If you have a question that is not answered here, feel free to contact us.
+  description: Have questions about astrology and our services? Here are some common queries we address.
   cta:
     label: Contact us
-    to: mailto:contact@shelve.cloud
+    to: mailto:contact@rashirhythm.com
   items:
-    - label: Is Shelve free?
+    - label: How do astrology consultations work?
       defaultOpen: true
-      content: Yes! Shelve is completely free and open-source. While we may introduce additional features in the future, our core functionality will always remain free and accessible to everyone.
-    - label: Is Shelve secure?
-      content: Security is our top priority. We use industry-standard **encryption (AES-256)** to protect your data, and all variables are encrypted at rest. Being open-source, our security practices are transparent and can be audited by anyone on GitHub.
-    - label: Can I self-host Shelve?
-      content: Absolutely! Shelve can be [self-hosted using Docker](/docs/self-hosting/docker) or with one-click using [Coolify](/docs/self-hosting/coolify). Self-hosting gives you full control over your data and infrastructure.
-    - label: Does Shelve integrate with other tools?
-      content: Yes! Shelve currently integrates with GitHub for secrets management, with more integrations planned. You can sync your environment variables directly with [GitHub Secrets](/docs/integrations/github).
-    - label: How can I contribute to Shelve?
-      content: We welcome contributions! You can contribute by submitting PRs, reporting bugs, suggesting features, or improving our documentation. Check our [Contributing Guide](/docs/contributing) to get started.
-    - label: Is Shelve production-ready?
-      content: Yes, Shelve is being actively used in production environments. While we're constantly adding new features, the core functionality is stable and reliable.
-    - label: How can I get support?
-      content: For technical support, you can open an issue on [GitHub](https://git.new/shelve) or reach out via email at contact@shelve.cloud.
+      content: Our consultations are based on your birth details, which help us analyze planetary placements and provide insights relevant to your life.
+    - label: Can astrology predict my future?
+      content: Astrology is not about predicting fixed outcomes but understanding influences and patterns to help you make informed choices.
+    - label: What details do I need to provide for a consultation?
+      content: To generate an accurate birth chart, we require your **date, time, and place of birth**.
+    - label: Do you offer remedies for planetary influences?
+      content: Yes, we suggest simple and practical remedies based on traditional astrological wisdom, but their practice is entirely your choice.
+    - label: Are sessions available online?
+      content: Yes! All consultations are conducted online via voice or video call, ensuring accessibility no matter where you are.
+    - label: Is astrology scientifically proven?
+      content: Astrology is a symbolic system of understanding life patterns. While not a science in the conventional sense, it has been studied and practiced for centuries.
+    - label: How can I book a session?
+      content: You can book a consultation directly through our website. Choose a session that fits your needs, and we'll guide you from there.
+    - label: How do I get in touch for support?
+      content: You can reach us at [contact@rashirhythm.com](mailto:contact@rashirhythm.com) for any queries or assistance.
+
+clipboard:
+  text: npx nypm add -D @shelve/cli
+  copy_message: Copied to clipboard
